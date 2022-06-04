@@ -7,6 +7,7 @@ import os
 
 class MyVkBot(vk_api.VkApi):
     def __init__(self, key_file_path:str, path_foldeg_imgs:str, words_file_path:str) -> None:
+        # создаем ключ и создаем бота
         api_key = self._get_api_key(key_file_path)
         super().__init__(token=api_key)
 
@@ -15,6 +16,7 @@ class MyVkBot(vk_api.VkApi):
         print('Картинки загружены.')
 
     def _load_defaul_img(self, path_foldeg_imgs:str, words_file_path:str) -> dict:
+        # Загружаем картинки по умолчанию
         upload = vk_api.VkUpload(self)
         imgs = dict()
         with open(words_file_path, 'r', encoding='utf-8') as f:
@@ -29,20 +31,24 @@ class MyVkBot(vk_api.VkApi):
         return imgs
 
     def _get_api_key(self, path:str) -> str:
+        # Читаем ключ из файла
         with open(path, 'r', encoding='utf-8') as f:
             api_key = f.read()
         return api_key
 
     def _send_text_msg(self, user_id:str, message:str, keyboard:object = None) -> None:
+        # Отправить текст
         if keyboard:
             self.method('messages.send', {'user_id': user_id, 'message': message, 'random_id': randint(99999, 999999), 'keyboard': keyboard})
         else:
             self.method('messages.send', {'user_id': user_id, 'message': message, 'random_id': randint(99999, 999999)})
 
     def _send_images(self, user_id:str, images_attachment:list) -> None:
+        # Отправить картинку
         self.method("messages.send", {'user_id': user_id, 'message': '' , 'attachment': ','.join(images_attachment), 'random_id': randint(99999, 999999)})
 
     def _get_random_cards(self, count_cards:int) -> dict:
+        # Получить увзанное количество случайных карт
         cards = dict()
         for i in range(count_cards):
             nums_imgs = list(self.imgs.keys())
@@ -52,6 +58,7 @@ class MyVkBot(vk_api.VkApi):
         return cards
     
     def _make_word(self, cards:dict) -> tuple:
+        # Загадать слово
         words = [i['words'] for i in cards.values()]
         word_make = set(words[0])
         for word in words[1:]:
@@ -63,6 +70,7 @@ class MyVkBot(vk_api.VkApi):
         return (None,)
 
     def main_circle(self) -> None:
+        # Основной цикл
         longpoll = VkLongPoll(self)
         for event in longpoll.listen():
             if event.type == VkEventType.MESSAGE_NEW:
@@ -90,5 +98,5 @@ class MyVkBot(vk_api.VkApi):
 
 
 if __name__ == "__main__":
-    bot = MyVkBot('api.txt', '/home/slawa/HDD/my_scripts/my_bots/vk_bot/imgs', '/home/slawa/HDD/my_scripts/my_bots/vk_bot/words.txt')
+    bot = MyVkBot('api.txt', '/imgs', 'words.txt')
     bot.main_circle()
