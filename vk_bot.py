@@ -86,6 +86,8 @@ class MyVkBot(vk_api.VkApi):
                             for num_img in cards.keys():
                                 keyboard.add_button(num_img)
                             self._send_text_msg(event.user_id, f'Угадайте картинку по её описнанию: {word[0]}', keyboard.get_keyboard())
+                        else:
+                            self._send_text_msg(event.user_id, 'Упс, не нашлось слова, которое однозначно описывает только одну картику.\nВведите повторно "Старт".')
                     elif request in cards.keys():
                         if request == word[1]:
                             user_score[str(event.user_id)] += 3
